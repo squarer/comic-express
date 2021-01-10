@@ -2,7 +2,6 @@ var DB = require('../model/DB.js');
 
 var express = require('express');
 var router = express.Router();
-var bcrypt = require('bcrypt');
 var crypto = require('crypto');
 
 
@@ -22,48 +21,6 @@ router.post('*', function(req, res, next) {
     };
 
     next();
-});
-
-router.post('/sign', function(req, res, next) {
-
-    DB.User.findOne({
-        '_id': req.body.id
-    }, function(err, user) {
-        if (err) return res.send(400, err);
-
-        if (user) { //exists
-
-            if (bcrypt.compareSync(req.body.passwd, user.passwd)) {
-                req.session.user = user;
-                return res.toJSON(user);
-            } else {
-                res.send(400, {
-                    RM: 'user avaiable'
-                });
-            }
-        } else { //sign up
-
-            var salt = bcrypt.genSaltSync(10);
-            var hashedPassword = bcrypt.hashSync(req.body.passwd, salt);
-
-            DB.User.create({
-                '_id': req.body.id,
-                passwd: hashedPassword,
-                thumbnailURL: req.body.thumbnailURL,
-                userName: req.body.userName,
-                token: createToken()
-            }, function(err, user) {
-                if (err) res.send(400, {
-                    RM: 'error creating user',
-                    err: err
-                });
-
-                req.session.user = user;
-
-                return res.toJSON(user);
-            });
-        }
-    });
 });
 
 router.get('/session', function(req, res, next) {

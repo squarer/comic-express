@@ -3,10 +3,6 @@ var DB = require('../model/DB.js');
 var express = require('express');
 var router = express.Router();
 
-//繁體 to 簡體
-var OpenCC = require('opencc');
-var opencc = new OpenCC('t2s.json');
-
 /////pre
 router.use('*', function(req, res, next) {
 
@@ -14,10 +10,8 @@ router.use('*', function(req, res, next) {
 
     //title
     if (req.query.title) {
-        var CHT_title = opencc.convertSync(req.query.title);
-
         req.query.find.title = {
-            '$regex': CHT_title
+            '$regex': req.query.title
         };
     };
 
@@ -51,7 +45,7 @@ router.use('*', function(req, res, next) {
 
             break;
     }
-    
+
     next();
 });
 
